@@ -2,11 +2,15 @@ package com.example.obi1.testapplication;
 
 import android.widget.EditText;
 
-public class TravelDealNG {
+import java.io.Serializable;
+
+public class TravelDealNG implements Serializable { //Serializable is the java's approach to declare intent extras explictly. Used to send deal class
     private String id;
     private String title;
     private String description;
     private String price;
+
+    public TravelDealNG() {}
 
     public TravelDealNG(String title, String description, String price) { //Constructor
         this.setId(getId());
