@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -13,6 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -25,12 +27,13 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
     private FirebaseDatabase myFirebase;
     private DatabaseReference mydatabase;
     private ChildEventListener mChildListener;
+    private ImageView imageDeal;
 
     public DealAdapter() {
-        FirebaseClassUtil.openFbReference("traveldeals"); //Replaces the Firebase reference above
+       // FirebaseClassUtil.openFbReference("traveldeals"); //Replaces the Firebase reference above
         myFirebase = FirebaseClassUtil.myFirebase;
         mydatabase = FirebaseClassUtil.mydatabase;
-        deals = FirebaseClassUtil.mDeals; //Will be used to populate array list
+        this.deals = FirebaseClassUtil.mDeals; //Will be used to populate array list
         mChildListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -94,6 +97,7 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle); //Reference to Title TV
             tvDescription = (TextView) itemView.findViewById(R.id.tvDescription); //Reference to Description TV
             tvPrice = (TextView) itemView.findViewById(R.id.tvPrice); //Reference to Price TV
+            imageDeal = (ImageView) itemView.findViewById(R.id.imageDeal); //Reference to the image thumbnail
             itemView.setOnClickListener(this); //Sets Onclick listener to deal item
         }
 
@@ -101,6 +105,7 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
             tvTitle.setText(deal.getTitle());
             tvDescription.setText(deal.getDescription());
             tvPrice.setText(deal.getPrice());
+            showImage(deal.getImageUrl());
         }
 
         @Override
@@ -111,6 +116,16 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
             Intent intent = new Intent(view.getContext(), DealActivity.class);
             intent.putExtra("Deal", selectedDeal);
             view.getContext().startActivity(intent);
+        }
+
+        private void showImage(String url) {
+            if (url != null && url.isEmpty()==false) { //If the url isnt empty
+                Picasso.with(imageDeal.getContext())
+                        .load(url)
+                        .resize(160, 160)
+                        .centerCrop()
+                        .into(imageDeal);
+            }
         }
     }
 }

@@ -9,14 +9,18 @@ public class TravelDealNG implements Serializable { //Serializable is the java's
     private String title;
     private String description;
     private String price;
+    private String imageUrl;
+    private String imageName;
 
     public TravelDealNG() {}
 
-    public TravelDealNG(String title, String description, String price) { //Constructor
+    public TravelDealNG(String title, String description, String price, String imageUrl, String imageName) { //Constructor
         this.setId(getId());
         this.setTitle(title);
         this.setDescription(description);
         this.setPrice(price);
+        this.setImageUrl(imageUrl);
+        this.setImageName(imageName);
     }
 
     public String getId() {
@@ -50,5 +54,20 @@ public class TravelDealNG implements Serializable { //Serializable is the java's
     public void setPrice(String price) {
         this.price = price;
     }
-    //private String imageUrl;
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
