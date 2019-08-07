@@ -4,12 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,37 +35,71 @@ public class DealActivity extends AppCompatActivity {
     EditText txtDescription; //Descip Variable
     EditText txtPrice; //Price Variable
     ImageView imageView;
+    String imageTitle;
     private TravelDealNG deal; //Travel Deal object container
     private static final int PICTURE_RESULT = 42; //the answer to everything
+    private Uri uri_global;
+    private String mUrl_image;
+    //private FileDownloadTask mUrl;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICTURE_RESULT && resultCode == RESULT_OK) { //Checks if the picture was acquired successfully
-            Uri imageUri = data.getData(); //Places the file to upload in the uri object. First step to uploading a file to FB CS.
-            final StorageReference ref = FirebaseClassUtil.mStorageRef.child(imageUri.getLastPathSegment()); //Gets a reference to the cloud storage
-            ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() { //Uploads the image
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { //Recieves a tasksnapshot. that the asynchrounous task.
-                    String url = ref.getDownloadUrl().toString();
-                    String pictureName = taskSnapshot.getStorage().getPath();
-                    deal.setImageUrl(url);
-                    deal.setImageName(pictureName);
-                    Log.d("Url: ", url);
-                    Log.d("Name", pictureName);
-                    showImage(url);
-                }
-            }); //This method returns an asynchrous upload task (Upload Task) where the code can listen for a success or failure
+            Uri imageUri = null; //Places the file to upload in the uri object. First step to uploading a file to FB CS.
+            if (data != null) {
+                imageUri = data.getData();
+            }
+            if (deal.getTitle() != null){ //Sets the title of the image to the deal title
+                imageTitle = deal.getTitle();
+            }else {
+                imageTitle = getString(R.string.No_Image_title);
+            }
+
+            final StorageReference ref = FirebaseClassUtil.mStorageRef.child(imageTitle); //Gets a reference to the cloud storage
+            if (imageUri != null) {
+                ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() { //Uploads the image
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { //Recieves a tasksnapshot. that the asynchrounous task. //This method returns an asynchrous upload task (Upload Task) where the code can listen for a success or failure
+                        Toast.makeText(DealActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                        grabImage(ref);
+                        String pictureName = taskSnapshot.getStorage().getPath();
+                        deal.setImageUrl(mUrl_image);
+                        deal.setImageName(pictureName);
+                        showImage(mUrl_image);//showImage(mUrl);
+                    }
+
+                    private void grabImage(final StorageReference reference) {
+                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                uri_global = uri;
+                                mUrl_image = uri.toString();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(DealActivity.this, "Unable to acquire image!!!", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }).addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(DealActivity.this, "Unable to upload image!!!", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
 
         }
     }
 
     private void showImage(String url) {
-        if (url != null && !url.isEmpty()) { //Resizes the image to match the screen width and 2/3 of the image view height, if the url isnt empty
+        if (url != null) { //Resizes the image to match the screen width and 2/3 of the image view height, if the url isnt empty
             int width = Resources.getSystem().getDisplayMetrics().widthPixels;
             Picasso.with(this)
-                    .load(url)
-                    .resize(width, width*1/2)
+                    .load(uri_global)//.load(url)
+                    .resize(width, width*2/3)
                     .centerCrop()
                     .into(imageView);
         }
@@ -85,7 +117,7 @@ public class DealActivity extends AppCompatActivity {
         txtTitle = findViewById(R.id.txtTitle); //Title edit text reference
         txtDescription = findViewById(R.id.txtDescription); //Descrip edit text reference
         txtPrice = findViewById(R.id.txtPrice); //Price edit text reference
-        imageView = (ImageView) findViewById(R.id.image);
+        imageView = findViewById(R.id.image);
         //deal = new TravelDealNG(txtTitle.toString(), txtDescription.toString(), txtPrice.toString()); //RETURN TO THIS LINE LATE!!! //Pass in an instance of TravelDealNG, using its constructor
 
         Intent intent = getIntent(); //Receives intent used to start this activity from list activity
@@ -97,6 +129,13 @@ public class DealActivity extends AppCompatActivity {
         txtTitle.setText(deal.getTitle());
         txtDescription.setText(deal.getDescription());
         txtPrice.setText(deal.getPrice());
+   /*     if(uri_global != deal.getImageUrl()){ //uses the uri directly
+            showImage(uri_global);//(deal.getImageUrl());
+        }else{
+            uri_global = deal.getImageUrl();
+            showImage(uri_global);
+        }*/
+
         showImage(deal.getImageUrl());
         Button btnImage = findViewById(R.id.btnImage); //Refernce to the add images button
         btnImage.setOnClickListener(new View.OnClickListener() {
@@ -105,8 +144,8 @@ public class DealActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // Intent of type get contents  used to the an image resource.
                 intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true); //The source of the image should be local
-                startActivityForResult(Intent.createChooser(intent,
-                        "Insert Picture"), PICTURE_RESULT);
+                startActivityForResult(Intent.createChooser(intent, //Remember to ask for permission at the Manifest.
+                        "Insert Image"), PICTURE_RESULT);
             }
         });
     }
@@ -190,7 +229,7 @@ public class DealActivity extends AppCompatActivity {
     }
 
     private void backToList() { //Used to return to list activity after saving deals to DB
-        Intent intent = new Intent(this, ListActivity.class);
+        Intent intent = new Intent(this, Listactivity.class);
         startActivity(intent);
     }
 

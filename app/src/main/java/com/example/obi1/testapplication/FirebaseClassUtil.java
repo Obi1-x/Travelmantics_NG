@@ -123,6 +123,6 @@ public class FirebaseClassUtil {
 
     public static void connectStorage() {
         mStorage = FirebaseStorage.getInstance(); //Instance of firebase storage
-        mStorageRef = mStorage.getReference().child("deals pictures");
+        mStorageRef = mStorage.getReference().child("deal pictures");
     }
 }
