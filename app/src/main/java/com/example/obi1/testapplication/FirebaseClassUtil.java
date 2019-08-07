@@ -1,7 +1,5 @@
 package com.example.obi1.testapplication;
 
-import android.app.Activity;
-import android.app.ListActivity;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -79,8 +77,13 @@ public class FirebaseClassUtil {
 
     private static void checkAdmin(String uid) {
         FirebaseClassUtil.isAdmin=false; //Sets the isAdmin variable to false
-        DatabaseReference ref = myFirebase.getReference().child("Admins")
-                .child(uid); //Gets a db reference to Admins child of Travelmantics
+        DatabaseReference ref = myFirebase.getReference().child("Admins").child(uid); //Gets a db reference to Admins child of Travelmantics
+        String test = myFirebase.getReference().child("btwDWYE3EbUCUkeZX562uRke91j1").getKey();//Replaced the action in onChild added
+        if (uid.equals(test)){
+            FirebaseClassUtil.isAdmin=true; //Sets the isAdmin variable to true
+            caller.showMenu();
+        }
+
         ChildEventListener listener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { //This method will get trigerred only when a child with the match uid was detected

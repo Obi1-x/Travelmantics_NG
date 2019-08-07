@@ -18,7 +18,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DealActivity">
+        <activity android:name=".DealActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Listactivity"/>
         </activity>
     </application>
 

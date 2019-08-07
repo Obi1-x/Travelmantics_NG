@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">TravelmanticsNG</string>
     <string name="Save_Menu">Save</string>
+    <string name="upload">Upload</string>
+    <string name="description">Description</string>
+    <string name="price_numbers_only">Price (numbers only)</string>
+    <string name="deal_title">Deal Title</string>
+    <string name="todo">TODO</string>
+    <string name="Currency">N</string>
 </resources>

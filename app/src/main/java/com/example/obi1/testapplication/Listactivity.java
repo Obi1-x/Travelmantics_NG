@@ -77,7 +77,7 @@ public class Listactivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_activity_menu, menu); //Inflates the insert new deal menu at listactivity layout
         MenuItem insertMenu = menu.findItem(R.id.insert_menu);
-        if (FirebaseClassUtil.isAdmin == true) { //Makes the insert menu vivsible for admins
+        if (FirebaseClassUtil.isAdmin) { //Makes the insert menu vivsible for admins
             insertMenu.setVisible(true);
         }
         else {

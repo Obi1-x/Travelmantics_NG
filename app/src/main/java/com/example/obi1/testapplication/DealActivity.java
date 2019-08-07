@@ -67,7 +67,7 @@ public class DealActivity extends AppCompatActivity {
             int width = Resources.getSystem().getDisplayMetrics().widthPixels;
             Picasso.with(this)
                     .load(url)
-                    .resize(width, width*2/3)
+                    .resize(width, width*1/2)
                     .centerCrop()
                     .into(imageView);
         }
@@ -105,7 +105,7 @@ public class DealActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // Intent of type get contents  used to the an image resource.
                 intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true); //The source of the image should be local
-                startActivityForResult(intent.createChooser(intent,
+                startActivityForResult(Intent.createChooser(intent,
                         "Insert Picture"), PICTURE_RESULT);
             }
         });
@@ -172,18 +172,18 @@ public class DealActivity extends AppCompatActivity {
             return;
         }
         mydatabase.child(deal.getId()).removeValue(); //Deletes from DB
-        Log.d("image name", deal.getImageName());
-        if(deal.getImageName() != null && deal.getImageName().isEmpty() == false) {
+        //Log.d("image name", deal.getImageName());
+        if(deal.getImageName() != null && !deal.getImageName().isEmpty()) {
             StorageReference picRef = FirebaseClassUtil.mStorage.getReference().child(deal.getImageName());
             picRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    Log.d("Delete Image", "Image Successfully Deleted");
+                    //Log.d("Delete Image", "Image Successfully Deleted");
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.d("Delete Image", e.getMessage());
+                    //Log.d("Delete Image", e.getMessage());
                 }
             });
         }
