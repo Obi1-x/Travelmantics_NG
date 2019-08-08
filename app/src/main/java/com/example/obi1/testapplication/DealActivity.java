@@ -38,7 +38,7 @@ public class DealActivity extends AppCompatActivity {
     String imageTitle;
     private TravelDealNG deal; //Travel Deal object container
     private static final int PICTURE_RESULT = 42; //the answer to everything
-    private Uri uri_global;
+    public static Uri uri_global;
     private String mUrl_image;
     //private FileDownloadTask mUrl;
 
@@ -46,10 +46,8 @@ public class DealActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICTURE_RESULT && resultCode == RESULT_OK) { //Checks if the picture was acquired successfully
-            Uri imageUri = null; //Places the file to upload in the uri object. First step to uploading a file to FB CS.
-            if (data != null) {
-                imageUri = data.getData();
-            }
+            Uri imageUri = data.getData(); //Places the file to upload in the uri object. First step to uploading a file to FB CS.
+
             if (deal.getTitle() != null){ //Sets the title of the image to the deal title
                 imageTitle = deal.getTitle();
             }else {
@@ -57,7 +55,6 @@ public class DealActivity extends AppCompatActivity {
             }
 
             final StorageReference ref = FirebaseClassUtil.mStorageRef.child(imageTitle); //Gets a reference to the cloud storage
-            if (imageUri != null) {
                 ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() { //Uploads the image
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { //Recieves a tasksnapshot. that the asynchrounous task. //This method returns an asynchrous upload task (Upload Task) where the code can listen for a success or failure
@@ -66,39 +63,34 @@ public class DealActivity extends AppCompatActivity {
                         String pictureName = taskSnapshot.getStorage().getPath();
                         deal.setImageUrl(mUrl_image);
                         deal.setImageName(pictureName);
-                        showImage(mUrl_image);//showImage(mUrl);
+                        showImage(uri_global);//showImage(mUrl);
                     }
 
                     private void grabImage(final StorageReference reference) {
                         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
+                                while(uri == null);
                                 uri_global = uri;
                                 mUrl_image = uri.toString();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(DealActivity.this, "Unable to acquire image!!!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(DealActivity.this, "Unable to acquire image!", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
-                }).addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(DealActivity.this, "Unable to upload image!!!", Toast.LENGTH_LONG).show();
-                    }
                 });
-            }
 
         }
     }
 
-    private void showImage(String url) {
+    private void showImage(Uri url) {
         if (url != null) { //Resizes the image to match the screen width and 2/3 of the image view height, if the url isnt empty
             int width = Resources.getSystem().getDisplayMetrics().widthPixels;
             Picasso.with(this)
-                    .load(uri_global)//.load(url)
+                    .load(url)//.load(url)
                     .resize(width, width*2/3)
                     .centerCrop()
                     .into(imageView);
@@ -136,7 +128,7 @@ public class DealActivity extends AppCompatActivity {
             showImage(uri_global);
         }*/
 
-        showImage(deal.getImageUrl());
+        showImage(uri_global);
         Button btnImage = findViewById(R.id.btnImage); //Refernce to the add images button
         btnImage.setOnClickListener(new View.OnClickListener() {
             @Override

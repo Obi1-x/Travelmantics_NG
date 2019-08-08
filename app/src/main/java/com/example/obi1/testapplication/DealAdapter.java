@@ -2,6 +2,7 @@ package com.example.obi1.testapplication;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -105,7 +106,7 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
             tvTitle.setText(deal.getTitle());
             tvDescription.setText(deal.getDescription());
             tvPrice.setText(String.format("N%s", deal.getPrice())); // Adds naira currency.
-            showImage(deal.getImageUrl());
+            showImage(DealActivity.uri_global);
         }
 
         @Override
@@ -118,8 +119,8 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
             view.getContext().startActivity(intent);
         }
 
-        private void showImage(String url) {
-            if (url != null && !url.isEmpty()) { //If the url isnt empty
+        private void showImage(Uri url) {
+            if (url != null) { //If the url isnt empty
                 Picasso.with(imageDeal.getContext())
                         .load(url)
                         .resize(160, 160)
